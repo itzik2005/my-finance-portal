@@ -4,138 +4,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>משיכת נתוני מניות | דוח פיננסי</title>
-    <!-- טעינת Tailwind CSS דרך CDN (מותאם לפרויקטים סטטיים ב-GitHub Pages) -->
+    
+    <!-- טעינת Tailwind עם fallback אם נכשל -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // הגדרת צבעים מותאמים אישית בסגנון פיננסי
+        // בדיקה אם Tailwind נטען בהצלחה
+        window.tailwind || document.write('<style>body{font-family:system-ui,sans-serif;background:#0b1120;color:#f1f5f9}</style>');
+        
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         finance: {
-                            bg: '#0b1120',      // רקע כהה עמוק
-                            card: '#151e32',    // כרטיס אפור-כחלחל
-                            border: '#1e293b',  // גבול עדין
-                            primary: '#2563eb', // כחול פיננסי ראשי
+                            bg: '#0b1120',
+                            card: '#151e32',
+                            border: '#1e293b',
+                            primary: '#2563eb',
                             primaryHover: '#1d4ed8',
-                            text: '#f1f5f9',    // טקסט ראשי
-                            muted: '#94a3b8'    // טקסט משני
+                            text: '#f1f5f9',
+                            muted: '#94a3b8'
                         }
                     }
                 }
             }
         }
     </script>
+    
     <style>
-        /* אנימציית כניסה עדינה לרכיבים */
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* עיצוב סליידר תאריכים מותאם לרקע כהה */
+        .fade-in { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8); cursor: pointer; }
+        /* סגנון בסיסי למקרה ש-Tailwind נכשל */
+        .no-tw { background: #0b1120; color: #f1f5f9; font-family: system-ui, sans-serif; }
+        .no-tw-card { background: #151e32; padding: 24px; border-radius: 16px; max-width: 500px; margin: 20px auto; }
     </style>
 </head>
-<body class="bg-finance-bg min-h-screen flex items-center justify-center p-4 font-sans text-finance-text">
+<body class="bg-finance-bg no-tw min-h-screen flex items-center justify-center p-4">
 
-    <!-- כרטיס מרכזי -->
-    <main class="bg-finance-card w-full max-w-md rounded-2xl shadow-2xl border border-finance-border p-6 md:p-8 fade-in">
+    <!-- הודעת שגיאה גלובלית (מוסתרת כברירת מחדל) -->
+    <div id="globalError" class="hidden fixed top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-xl shadow-xl z-50 text-center max-w-md"></div>
+
+    <main class="bg-finance-card no-tw-card w-full max-w-md rounded-2xl shadow-2xl border border-finance-border p-6 md:p-8 fade-in">
         <header class="text-center mb-8">
             <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent pb-1">
                 משיכת נתוני מניות
             </h1>
-            <p class="text-finance-muted text-sm mt-2">הזן סימולים, הגדר טווח זמן ותדירות לקבלת דוח מעודכן</p>
+            <p class="text-finance-muted text-sm mt-2">הזן סימולים, הגדר טווח זמן ותדירות</p>
         </header>
 
-        <!-- טופס קלט -->
         <form id="stockForm" class="space-y-5">
-            <!-- סימולי מניות -->
             <div>
                 <label for="symbols" class="block text-sm font-medium text-finance-muted mb-1">סימולי מניות (מופרדים בפסיק)</label>
-                <input type="text" id="symbols" placeholder="TSLA, AAPL, AMZN, NVDA" required
-                       class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200">
+                <input type="text" id="symbols" placeholder="TSLA, AAPL, AMZN" required
+                       class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
-            <!-- טווח תאריכים -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label for="startDate" class="block text-sm font-medium text-finance-muted mb-1">תאריך התחלה</label>
-                    <input type="date" id="startDate" required
-                           class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200">
+                    <input type="date" id="startDate" required class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
                     <label for="endDate" class="block text-sm font-medium text-finance-muted mb-1">תאריך סיום</label>
-                    <input type="date" id="endDate" required
-                           class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200">
+                    <input type="date" id="endDate" required class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
             </div>
 
-            <!-- תדירות -->
             <div>
-                <label for="frequency" class="block text-sm font-medium text-finance-muted mb-1">תדירות נתונים</label>
-                <select id="frequency" required
-                        class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200">
-                    <option value="daily">Daily (יומי)</option>
-                    <option value="weekly">Weekly (שבועי)</option>
-                    <option value="monthly">Monthly (חודשי)</option>
+                <label for="frequency" class="block text-sm font-medium text-finance-muted mb-1">תדירות</label>
+                <select id="frequency" required class="w-full px-4 py-3 bg-finance-bg border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
                 </select>
             </div>
 
-            <!-- כפתור שליחה -->
             <button type="submit" id="submitBtn"
-                    class="w-full py-3.5 bg-finance-primary hover:bg-finance-primaryHover text-white font-semibold rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    class="w-full py-3.5 bg-finance-primary hover:bg-finance-primaryHover text-white font-semibold rounded-xl transition disabled:opacity-60">
                 שלח ובקש נתונים
             </button>
         </form>
 
-        <!-- אזור הצלחה -->
         <div id="successArea" class="hidden mt-6 fade-in text-center">
             <div class="p-4 bg-green-900/30 border border-green-700/50 rounded-xl mb-4">
-                <p class="text-green-400 font-medium text-sm">✅ הבקשה עובדה בהצלחה</p>
+                <p class="text-green-400 font-medium">✅ הבקשה עובדה בהצלחה</p>
             </div>
             <button id="openSheetBtn"
-                    class="w-full py-4 bg-green-600 hover:bg-green-500 text-white text-lg font-bold rounded-xl transition shadow-lg hover:shadow-green-500/30 flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                </svg>
-                פתח גיליון נתונים
+                    class="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition">
+                📄 פתח גיליון נתונים
             </button>
         </div>
 
-        <!-- אזור שגיאה -->
         <div id="errorArea" class="hidden mt-6 fade-in text-center p-4 bg-red-900/30 border border-red-700/50 rounded-xl text-red-300 text-sm"></div>
+        
+        <!-- אזור דיבאג (מוסתר, נפתח רק אם צריך) -->
+        <details class="mt-6 text-xs text-finance-muted">
+            <summary class="cursor-pointer hover:text-blue-400">🔧 פרטי דיבאג (לחץ לפתיחה)</summary>
+            <pre id="debugInfo" class="mt-2 p-3 bg-black/30 rounded overflow-x-auto text-[11px]"></pre>
+        </details>
     </main>
 
     <script>
-        // 🔹 כתובת ה-Google Apps Script שלך - מעודכן!
+        // 🔹 כתובת ה-Web App שלך
         const API_URL = 'https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/dev';
-
-        // ⏳ קבועים לרכיבי ה-DOM
+        
         const form = document.getElementById('stockForm');
         const submitBtn = document.getElementById('submitBtn');
         const successArea = document.getElementById('successArea');
         const openSheetBtn = document.getElementById('openSheetBtn');
         const errorArea = document.getElementById('errorArea');
+        const globalError = document.getElementById('globalError');
+        const debugInfo = document.getElementById('debugInfo');
 
-        // 📅 הגדרת טווח תאריכים דיפולטיבי (30 ימים אחורה עד היום)
-        const today = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-        
-        document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
-        document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        // 📅 הגדרת תאריכים דיפולטיביים
+        const today = new Date().toISOString().split('T')[0];
+        const thirtyDaysAgo = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+        document.getElementById('startDate').value = thirtyDaysAgo;
+        document.getElementById('endDate').value = today;
 
-        // 🚀 האזנה לאירוע שליחת טופס
+        // פונקציית עזר להצגת שגיאות
+        function showError(msg, isGlobal = false) {
+            console.error('❌ ERROR:', msg);
+            const target = isGlobal ? globalError : errorArea;
+            target.textContent = msg;
+            target.classList.remove('hidden');
+            debugInfo.textContent = `Time: ${new Date().toLocaleTimeString('he-IL')}\nURL: ${API_URL}\nError: ${msg}`;
+            if (isGlobal) setTimeout(() => globalError.classList.add('hidden'), 5000);
+        }
+
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // מניעת רענון דף ברירת המחדל
-
-            // נקה הודעות קודמות
+            e.preventDefault();
             errorArea.classList.add('hidden');
             successArea.classList.add('hidden');
 
-            // אסוף נתונים מהטופס
             const payload = {
                 symbols: document.getElementById('symbols').value.trim(),
                 startDate: document.getElementById('startDate').value,
@@ -143,50 +144,66 @@
                 frequency: document.getElementById('frequency').value
             };
 
-            // ⚙️ עדכון כפתור למצב טעינה
+            // ⚙️ מצב טעינה
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                טוען נתונים...
-            `;
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = '⏳ מעבד...';
 
             try {
-                // 🌐 שליחה ב-POST עם כותרת ייעודית למניעת שגיאות CORS Preflight
+                console.log('📤 Sending:', payload);
+                debugInfo.textContent = `Sending to: ${API_URL}\nPayload: ${JSON.stringify(payload, null, 2)}`;
+
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8' // מוגדר לפי בקשתך
-                    },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
 
-                // בדיקת תקינות תגובת השרת
+                console.log('📥 Response status:', response.status);
+                debugInfo.textContent += `\n\nResponse status: ${response.status}\nResponse OK: ${response.ok}`;
+
                 if (!response.ok) {
-                    throw new Error(`שגיאת שרת: ${response.status} ${response.statusText}`);
+                    const errorText = await response.text().catch(() => 'לא ניתן לקרוא תגובה');
+                    throw new Error(`שגיאת שרת ${response.status}: ${errorText.slice(0, 200)}`);
                 }
 
-                // ניתוח תגובת ה-JSON מהשרת
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const raw = await response.text();
+                    console.warn('⚠️ תגובה לא בפורמט JSON:', raw.slice(0, 300));
+                    throw new Error(`השרת לא החזיר JSON. סוג תוכן: ${contentType || 'לא ידוע'}`);
+                }
+
                 const data = await response.json();
+                console.log('✅ Data received:', data);
+                debugInfo.textContent += `\n\nResponse JSON: ${JSON.stringify(data, null, 2)}`;
 
                 if (data.sheetUrl) {
-                    // 📄 הצלחה: עדכון כפתור הפתיחה עם הלינק שחזר
-                    openSheetBtn.onclick = () => window.open(data.sheetUrl, '_blank');
+                    openSheetBtn.onclick = () => {
+                        console.log('🔗 Opening:', data.sheetUrl);
+                        window.open(data.sheetUrl, '_blank');
+                    };
                     successArea.classList.remove('hidden');
                 } else {
-                    throw new Error('לא התקבל קישור גיליון (sheetUrl) בתגובת השרת');
+                    throw new Error('לא התקבל שדה sheetUrl בתגובה. בדוק את אזור הדיבאג למטה.');
                 }
-            } catch (error) {
-                // ❌ טיפול בשגיאות
-                console.error('שגיאה בתהליך:', error);
-                errorArea.textContent = `❌ ${error.message || 'אירעה שגיאה לא צפויה בשליחת הנתונים'}`;
-                errorArea.classList.remove('hidden');
+
+            } catch (err) {
+                showError(err.message);
             } finally {
-                // 🔄 שחזור כפתור למצב רגיל
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'שלח ובקש נתונים';
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+
+        // 🛡 בדיקת תקינות בסיסית בעת טעינת הדף
+        window.addEventListener('load', () => {
+            if (!API_URL || API_URL.includes('YOUR_WEB_APP_URL')) {
+                showError('⚠️ כתובת ה-Web App לא הוגדרה! ערוך את הקוד והחלף את API_URL', true);
+            }
+            // בדיקה אם הדף נטען דרך file:// (יכול לגרום לבעיות עם fetch)
+            if (window.location.protocol === 'file:') {
+                console.warn('⚠️ הדף נפתח דרך file:// - חלק מהבקשות עשויות להיחסם על ידי הדפדפן. מומלץ להשתמש בשרת מקומי או GitHub Pages.');
             }
         });
     </script>
