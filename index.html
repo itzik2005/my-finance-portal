@@ -1,11 +1,10 @@
-```html
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <title>Stock Data Fetcher</title>
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -23,12 +22,9 @@
       📈 משיכת נתוני מניות
     </h1>
 
-    <!-- ========================= -->
-    <!-- טופס קלט -->
-    <!-- ========================= -->
+    <!-- טופס -->
     <form id="stockForm" class="space-y-4">
 
-      <!-- סימולים -->
       <div>
         <label class="block mb-1">סימולי מניות</label>
         <input 
@@ -40,39 +36,25 @@
         />
       </div>
 
-      <!-- תאריך התחלה -->
       <div>
         <label class="block mb-1">תאריך התחלה</label>
-        <input 
-          type="date" 
-          id="startDate"
-          class="w-full p-2 rounded-lg text-black"
-          required
-        />
+        <input type="date" id="startDate" class="w-full p-2 rounded-lg text-black" required />
       </div>
 
-      <!-- תאריך סיום -->
       <div>
         <label class="block mb-1">תאריך סיום</label>
-        <input 
-          type="date" 
-          id="endDate"
-          class="w-full p-2 rounded-lg text-black"
-          required
-        />
+        <input type="date" id="endDate" class="w-full p-2 rounded-lg text-black" required />
       </div>
 
-      <!-- תדירות -->
       <div>
         <label class="block mb-1">תדירות</label>
         <select id="frequency" class="w-full p-2 rounded-lg text-black">
-          <option value="1d">Daily</option>
-          <option value="1wk">Weekly</option>
-          <option value="1mo">Monthly</option>
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
         </select>
       </div>
 
-      <!-- כפתור שליחה -->
       <button 
         type="submit"
         id="submitBtn"
@@ -83,9 +65,7 @@
 
     </form>
 
-    <!-- ========================= -->
     <!-- תוצאה -->
-    <!-- ========================= -->
     <div id="result" class="mt-6 text-center hidden">
       <a 
         id="sheetLink"
@@ -98,25 +78,14 @@
 
   </div>
 
-
 <script>
-/**
- * מאזין לשליחת הטופס
- */
 document.getElementById("stockForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const btn = document.getElementById("submitBtn");
-
-  // =========================
-  // מצב טעינה
-  // =========================
   btn.innerText = "טוען נתונים...";
   btn.disabled = true;
 
-  // =========================
-  // קריאת ערכים מהטופס
-  // =========================
   const tickers = document.getElementById("tickers").value
     .split(",")
     .map(t => t.trim().toUpperCase());
@@ -125,41 +94,31 @@ document.getElementById("stockForm").addEventListener("submit", async function(e
   const endDate = document.getElementById("endDate").value;
   const frequency = document.getElementById("frequency").value;
 
-  // יצירת JSON לשליחה
-  const payload = {
-    tickers,
-    startDate,
-    endDate,
-    frequency
-  };
+  const payload = { tickers, startDate, endDate, frequency };
 
   try {
-    // =========================
-    // שליחת בקשה לשרת (POST)
-    // =========================
-    const response = await fetch(https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/dev, {
-      method: "POST",
 
-      // ⚠️ חשוב: text/plain כדי לעקוף CORS ב-GAS
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-
-      body: JSON.stringify(payload)
-    });
+    // =========================
+    // 🔥 הקישור שלך כאן
+    // =========================
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
 
     const data = await response.json();
 
-    // =========================
-    // הצלחה
-    // =========================
     if (data.status === "success") {
-
       const link = document.getElementById("sheetLink");
       link.href = data.sheetUrl;
 
       document.getElementById("result").classList.remove("hidden");
-
     } else {
       alert("שגיאה: " + data.message);
     }
@@ -168,9 +127,6 @@ document.getElementById("stockForm").addEventListener("submit", async function(e
     alert("שגיאת רשת: " + err.message);
   }
 
-  // =========================
-  // החזרת הכפתור למצב רגיל
-  // =========================
   btn.innerText = "שלח בקשה";
   btn.disabled = false;
 });
@@ -178,4 +134,3 @@ document.getElementById("stockForm").addEventListener("submit", async function(e
 
 </body>
 </html>
-```
