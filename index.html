@@ -65,35 +65,13 @@ document.getElementById("stockForm").addEventListener("submit", async (e) => {
 
   try {
 
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/exec",
-      {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    // 🔥 תיקון קריטי (לא .json!)
-    const text = await response.text();
-    const data = JSON.parse(text);
-
-    if (data.status === "success") {
-      document.getElementById("sheetLink").href = data.sheetUrl;
-      document.getElementById("result").classList.remove("hidden");
-    } else {
-      alert("שגיאה: " + data.message);
-    }
-
-  } catch (err) {
-    alert("שגיאת רשת: " + err.message);
-  }
-
-  btn.innerText = "שלח בקשה";
-  btn.disabled = false;
+    const response = awaitfetch("https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/exec", {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify(payload)
 });
 </script>
 
