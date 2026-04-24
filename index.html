@@ -1,35 +1,100 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Data Fetcher</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #0f172a, #1e293b);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center text-white">
+
+  <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-xl">
+
+    <h1 class="text-2xl font-bold mb-6 text-center">
+      📈 משיכת נתוני מניות
+    </h1>
+
+    <form id="stockForm" class="space-y-4">
+
+      <input id="tickers" class="w-full p-2 rounded text-black" placeholder="TSLA, AAPL" required />
+      <input id="startDate" type="date" class="w-full p-2 rounded text-black" required />
+      <input id="endDate" type="date" class="w-full p-2 rounded text-black" required />
+
+      <select id="frequency" class="w-full p-2 rounded text-black">
+        <option value="Daily">Daily</option>
+        <option value="Weekly">Weekly</option>
+        <option value="Monthly">Monthly</option>
+      </select>
+
+      <button id="submitBtn" class="w-full bg-blue-600 p-3 rounded font-bold">
+        שלח בקשה
+      </button>
+
+    </form>
+
+    <div id="result" class="mt-6 text-center hidden">
+      <a id="sheetLink" target="_blank"
+         class="inline-block bg-green-500 px-6 py-3 rounded font-bold">
+        פתח גיליון 📊
+      </a>
+    </div>
+
+  </div>
+
 <script>
-document.getElementById("stockForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+window.addEventListener("DOMContentLoaded", () => {
 
+  const form = document.getElementById("stockForm");
   const btn = document.getElementById("submitBtn");
-  btn.innerText = "טוען...";
-  btn.disabled = true;
+  const result = document.getElementById("result");
+  const link = document.getElementById("sheetLink");
 
-  const payload = {
-    tickers: document.getElementById("tickers").value.split(",").map(t => t.trim()),
-    startDate: document.getElementById("startDate").value,
-    endDate: document.getElementById("endDate").value,
-    frequency: document.getElementById("frequency").value
-  };
-
-  try {
-
-    // ✅ שולח בלבד (בלי לחכות ל־CORS response)
-    fetch("https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/exec", {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(payload)
-    });
-
-    // 🔥 הודעת הצלחה "אופטימית"
-    alert("הבקשה נשלחה! בדוק את Google Sheet שנוצר.");
-
-  } catch (err) {
-    alert("שגיאת שליחה: " + err.message);
+  if (!form || !btn) {
+    console.error("Missing elements");
+    return;
   }
 
-  btn.innerText = "שלח בקשה";
-  btn.disabled = false;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    btn.innerText = "טוען...";
+    btn.disabled = true;
+
+    const payload = {
+      tickers: document.getElementById("tickers").value.split(",").map(t => t.trim()),
+      startDate: document.getElementById("startDate").value,
+      endDate: document.getElementById("endDate").value,
+      frequency: document.getElementById("frequency").value
+    };
+
+    try {
+
+      // 🔥 שליחה יציבה (בלי CORS crash)
+      fetch("https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/exec", {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+      });
+
+      alert("הבקשה נשלחה ✔️ בדוק את Google Sheets");
+
+    } catch (err) {
+      alert("שגיאה: " + err.message);
+    }
+
+    btn.innerText = "שלח בקשה";
+    btn.disabled = false;
+  });
+
 });
 </script>
+
+</body>
+</html>
