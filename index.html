@@ -95,11 +95,9 @@ document.getElementById("stockForm").addEventListener("submit", async function(e
 
   try {
 
-    // =========================
-    // 🔥 כאן הוחלף ל־/exec
-    // =========================
+    // ✅ FIXED: מרכאות + /exec + fetch תקין
     const response = await fetch(
-      https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/dev,
+      "https://script.google.com/macros/s/AKfycbwnszvw2cot0sAHBXDZDOOvwZFnU5r0XyRE8784HxF_/exec",
       {
         method: "POST",
         headers: {
